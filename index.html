@@ -6,6 +6,136 @@
 </head>
 <body>
 <div id="app"></div>
-<script src="/dist/build.js"></script>
+<script src="/dist/vue-demo.js">
+    var ajaxreq = false, ajaxCallback;
+
+    function ajaxRequest(filename) {
+        try {
+            //Firefox / IE7 / Others
+            ajaxreq = new XMLHttpRequest();
+        }
+        catch (error) {
+            try {
+                ajaxreq = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            catch (error) {
+                return false;
+            }
+        }
+        ajaxreq.open("GET", filename);
+        ajaxreq.onreadystatechange = ajaxResponse;
+        ajaxreq.send(null);		//发送请求
+    }
+    //事件处理程序
+    function ajaxResponse() {
+        if (ajaxreq.readyState != 4) return;
+        if (ajaxreq.status = 200) {
+            //事件正常，请求成功
+            if (ajaxCallback) ajaxCallback();
+        }
+        else {
+            alert("Request failed" + ajaxreq.statusText);
+        }
+        return true;		//为什么return true？只要readyState等于4就一定成功？
+    }
+
+    var qn = 0;	//qn是问题编号
+    function getQuestions() {
+        qn = 0;	//点击开始按钮后，重置问题
+        var obj = document.getElementById("question");	//obj是question的（HTML）
+        //之所以设置下面这行，是因为在异步加载成功前显示这里
+        obj.firstChild.nodeValue = "(please wait)";	//obj的所有子节点中的第一个子节点的值是please wait。作用是将其写到<span id="question">...</span>中
+        ajaxCallback = nextQuestion;	//将函数赋给回调函数（ajaxCallback），在ajax里调用
+        ajaxRequest("questions.xml");		//调用ajax库加载questions.xml文件
+    }
+
+    //作用是读取、并输出问题
+    function nextQuestion() {
+        var questions = ajaxreq.responseXML.getElementsByTagName("q");	//questions被赋值为AJAX返回的XML文件中标签为q的（在XML中）
+        obj = document.getElementById("question");	//obj为标签是question（在AJAX.html中）
+        if (qn < questions.length)	//如果qn小于questions的长度（即未到结尾）
+        {
+            q = questions[qn].firstChild.nodeValue;	//q是读取的值
+            obj.firstChild.nodeValue = q;	//将其输入到HTML中显示
+        }
+        else {
+            obj.firstChild.nodeValue = "(no more questions)";	//如果没有更多问题了，那么提示用户
+        }
+    }
+
+    function checkAnswer() {
+        var answers = ajaxreq.responseXML.getElementsByTagName("a");	//answers是一个数组（因为有多个<a>标签）
+        var a = answers[qn].firstChild.nodeValue;	//firstChild.nodeValue指所有子节点（childNodes）中的第一个子节点的文本值
+        var answerfield = document.getElementById("answer");	//HTML输入位置的内容（id是answer）的值
+        if (a == answerfield.value)	//如果读取的值（XML中的），和输入的值（HTML用户输入的）一样
+        {
+            alert("Correct!");	//弹框提示正确
+        }
+        else {
+            alert("Incorrect. The correct answer is: " + a);	//弹框提示错误，并告知正确的答案
+        }
+        qn += 1;	//问题编号+1
+        answerfield.value = "";		//重置答案
+        nextQuestion();	//调用函数
+    }
+    var obj = document.getElementById("startq");	//ojb是startq按钮
+    obj.onclick = getQuestions;	//点击后调用函数，不用()表示不执行，只有当点击后才执行
+    var ans = document.getElementById("submit");	//ans是提交按钮
+    ans.onclick = checkAnswer;	//点击后调用函数
+
+
+</script>
+
+<script>
+    var ajax = function (options) {
+        /*  参数
+         *   1、类型对象，以下是key：
+         *   2、url：链接
+         *   3、type：请求方式
+         *
+         * */
+
+        //支持最低IE7
+        var req = null;
+        var obj = {
+            start: function () {
+                req = new XMLHttpRequest();
+                req.open(options.type, options.url);
+                req.onreadystatechange = function () {
+                    console.log(req);
+                    if (req.readyState != 4) {
+                        if (typeof obj.fail === "function") {
+                            obj.fail(req.statusText);
+                        }
+                        return;
+                    }
+                    if (req.status = 200) {
+                        //事件正常，请求成功
+                        if (typeof obj.done === "function") {
+                            obj.done();
+                        }
+                    }
+                    else {
+                        alert("Request failed" + req.statusText);
+                    }
+                    return true;
+                }
+                req.send(null);
+            },
+            done: function (callback) {
+                callback(req.response);
+            }
+        }
+        obj.start();
+        return obj;
+    }
+
+    var test = ajax({
+        url: "/getForLearn",
+        type: "GET"
+    }).done(function (val) {
+        console.log(val)
+    })
+</script>
 </body>
 </html>

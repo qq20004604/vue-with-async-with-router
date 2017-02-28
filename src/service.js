@@ -60,6 +60,93 @@ export default {
                     return false;
                 }
                 return true;
+            },
+            //封装的ajax设置，这个是promise版的
+            ajaxByPromise: function (options) {
+                /*  参数
+                 *   1、类型对象，以下是key：
+                 *   2、url：链接
+                 *   3、type：请求方式
+                 *  目前没有出错处理
+                 *  回调函数通过ajax.then(成功函数, 失败函数)来使用\
+                 *      ajax({
+                 *          url: "/getForLearn",
+                 *          type: "GET"
+                 *      }).then(function (val) {
+                 *              console.log(val)
+                 *      })
+                 * */
+                var promise = new Promise(function (resolve, reject) {
+                    var req = new XMLHttpRequest();
+                    req.open(options.type, options.url);
+                    //这里可以后续添加其他设置
+
+                    req.onreadystatechange = function () {
+                        console.log(req);
+                        if (req.readyState != 4) {
+                            return;
+                        }
+                        if (req.status = 200) {
+                            //事件正常，请求成功
+                            resolve(req.response);
+                        }
+                        else {
+                            reject(new Error(this.statusText));
+                        }
+                        return true;
+                    }
+                    req.send();
+                });
+                return promise;
+            },
+
+            //封装的另外一个ajax，这个是非promise版的，类似jquery，具体见注释
+            ajax: function (options) {
+                /*  参数
+                 *   1、类型对象，以下是key：
+                 *   2、url：链接
+                 *   3、type：请求方式
+                 *  目前没有出错处理
+                 *  回调函数通过ajax.then(成功函数, 失败函数)来使用
+                 *  示例代码：
+                 ajax({
+                 url: "/getForLearn",
+                 type: "GET"
+                 }).done(function (val) {
+                 console.log(val)
+                 }).fail(function (err) {
+                 console.error(err);
+                 })
+                 * */
+                var obj = {};
+                //分别表示成功和失败函数
+                var success, fail;
+                obj.done = function (success2) {
+                    success = success2;
+                    return obj;
+                }
+                obj.fail = function (fail2) {
+                    fail = fail2;
+                    return obj;
+                }
+                var req = new XMLHttpRequest();
+                req.open(options.type, options.url);
+                //这里可以后续添加其他设置
+
+                req.onreadystatechange = function () {
+                    if (req.readyState !== 4) {
+                        return;
+                    }
+                    if (req.status === 200) {
+                        success(req.response);
+                    }
+                    else {
+                        fail(this.statusText);
+                    }
+                    return true;
+                }
+                req.send();
+                return obj;
             }
         }
     }
