@@ -86,7 +86,7 @@ export default {
                         if (req.readyState != 4) {
                             return;
                         }
-                        if (req.status = 200) {
+                        if (req.status === 200) {
                             //事件正常，请求成功
                             resolve(req.response);
                         }
