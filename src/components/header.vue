@@ -4,7 +4,7 @@
         <header class="login-header">
             <div class="login-header-container">
                 <a href="#">首页</a>
-                <a @click="test" v-if="user">你好! {{user}}</a>
+                <a v-if="user">你好! {{user}}</a>
                 <a @click="logout" v-if="user">登出</a>
             </div>
         </header>
@@ -50,31 +50,27 @@
 </style>
 <script>
     import Bus from '../event-bus.js'
+    import USER from '../user'
 
     export default{
         name: "header",
         created: function () {
-            var self = this;
-            Bus.$on("/login-success", function (val) {
-                self.user = val;
-            });
-            Bus.$on("/logout", function () {
-                self.user = "";
-            })
+
         },
         data(){
             return {
-                user: "",
                 abc: "2"
             }
         },
+        computed: {
+            user: function () {
+                return USER.user;
+            }
+        },
         methods: {
-            test: function () {
-//                this.$router.push({path: '/index'})
-                console.log(this.abc);
-            },
             logout: function () {
-                Bus.$emit("/logout");
+                USER.user = '';
+                router.push('/');
             }
         },
     }

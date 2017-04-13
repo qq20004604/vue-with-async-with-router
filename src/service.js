@@ -120,7 +120,7 @@ export default {
                  * */
                 var obj = {};
                 //分别表示成功和失败函数
-                var success, fail;
+                var success, fail, doing;
                 obj.done = function (success2) {
                     success = success2;
                     return obj;
@@ -129,11 +129,20 @@ export default {
                     fail = fail2;
                     return obj;
                 }
+                obj.doing = function (doing2) {
+                    doing = doing2;
+                    return obj;
+                }
                 var req = new XMLHttpRequest();
-                req.open(options.type, options.url);
+                req.open(options.type, options.url, true);
                 //这里可以后续添加其他设置
 
                 req.onreadystatechange = function () {
+                    //请求发出之后会执行以下这段代码
+                    if (req.readyState === 2) {
+                        doing();
+                        return;
+                    }
                     if (req.readyState !== 4) {
                         return;
                     }

@@ -1,8 +1,3 @@
-<template>
-    <div>
-
-    </div>
-</template>
 <style>
     /*输入框，普通的，仿bootstrap*/
     .normal-input {

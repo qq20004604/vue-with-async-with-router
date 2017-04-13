@@ -2,7 +2,7 @@
     <div>
         <page-header></page-header>
         <div :class="{loginBackground:!user}">
-            <router-view :name="showPage"></router-view>
+            <router-view></router-view>
         </div>
         <page-footer></page-footer>
     </div>
@@ -32,31 +32,19 @@
     import footer from './components/footer.vue'
     //global event bus，全局事件写这里
     import Bus from './event-bus.js'
+    import USER from './user'
     //样式列表
     import style from './components/style-list.vue'
     export default {
         name: 'app',
         created: function () {
-            var self = this;
-            Bus.$on("/login-success", function (val) {
-                self.user = val;
-            })
-            Bus.$on("/logout", function (val) {
-                self.user = null;
-            })
         },
         data () {
-            return {
-                user: null  //当前用户名，未登录为空
-            }
+            return {}
         },
         computed: {
-            showPage: function () {
-                if (this.user === null || this.user === undefined) {
-                    return "loginPage"
-                } else {
-                    return "main"
-                }
+            user(){
+                return USER.user
             }
         },
         components: {

@@ -13,19 +13,8 @@ import service from './service.js'
 Vue.use(VueRouter)
 Vue.use(service)
 
-// var MyPlugin = {
-//     install: function (Vue) {
-//         Vue.mixin({
-//             created: function () {
-//                 console.log("另外一个插件")
-//             }
-//         })
-//     }
-// }
-// Vue.use(MyPlugin)
-
 // 创建 router 实例，然后传 `routes` 配置
-const router = new VueRouter({
+global.router = new VueRouter({
     routes: routeConfig
 })
 

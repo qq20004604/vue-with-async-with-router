@@ -217,6 +217,8 @@
 </style>
 <script>
     import Bus from '../event-bus.js'
+    import USER from '../user'
+
     /*  王冬  2017/2/27
      *   登录逻辑：
      *   1、没点过登录按钮不提示任何信息；
@@ -287,18 +289,16 @@
             //登录函数
             login: function () {
                 //todo test测试代码，变量控制，主要用来测试效果的
-                var random = true; //每次随机生成效果
+                var random = false; //每次随机生成效果
                 if (random) {
                     var logining = Math.random() > 0.5;
                     var ajax = Math.random() > 0.5 ? 1 : 2;
                     var successLogin = Math.random() > 0.5;
                 } else {
                     var logining = false;   //一直在登录true，跳过登录中效果false
-                    var ajax = 2;   //请求成功1，失败/过期2
+                    var ajax = 1;   //请求成功1，失败/过期2
                     var successLogin = true;   //成功登录1，密码错误2
                 }
-                console.log([logining, ajax, successLogin]);
-
                 //如果已经登录成功了，则拒绝继续发起登录请求，防止重复点击登录
                 if (this.loginState === 'successLogin') {
                     return;
@@ -334,9 +334,9 @@
                             //todo 然后在这里写跳转逻辑
                             //1秒后跳转
                             setTimeout(function () {
-                                console.log("123")
                                 //emit事件，进行跳转
-                                Bus.$emit("/login-success", username);
+                                USER.user = username;
+                                router.push("user")
                             }, 1000);
                             return;
                         } else {
